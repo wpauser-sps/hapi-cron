@@ -239,6 +239,32 @@ describe('registration assertions', () => {
             expect(err.message).toEqual('onComplete value must be a function');
         }
     });
+
+    it('should throw error when a job is having an improper invoke', async () => {
+
+        const server = new Hapi.Server();
+
+        try {
+            await server.register({
+                plugin: HapiCron,
+                options: {
+                    jobs: [{
+                        name: 'testcron',
+                        time: '*/10 * * * * *',
+                        timezone: 'Europe/London',
+                        invoke: 'Hugo',
+                        request: {
+                            method: 'GET',
+                            url: '/test-url'
+                        }
+                    }]
+                }
+            });
+        }
+        catch (err) {
+            expect(err.message).toEqual('invoke value must be a function or boolean');
+        }
+    });
 });
 
 describe('plugin functionality', () => {
