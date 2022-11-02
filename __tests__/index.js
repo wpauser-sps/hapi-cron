@@ -334,6 +334,46 @@ describe('plugin functionality', () => {
         expect(onComplete).toHaveBeenCalledWith('hello world');
     });
 
+    it('should ensure the request and callback from the plugin options are NOT triggered', async (done) => {
+
+        const onComplete = jest.fn();
+        const server = new Hapi.Server();
+
+        await server.register({
+            plugin: HapiCron,
+            options: {
+                jobs: [{
+                    name: 'testcron',
+                    time: '*/10 * * * * *',
+                    timezone: 'Europe/London',
+                    invoke: false,
+                    request: {
+                        method: 'GET',
+                        url: '/test-url'
+                    },
+                    onComplete
+                }]
+            }
+        });
+
+        server.route({
+            method: 'GET',
+            path: '/test-url',
+            handler: () => {
+
+                return 'hello world';
+            }
+        });
+
+        expect(onComplete).not.toHaveBeenCalled();
+
+        await server.plugins['hapi-cron'].jobs.testcron._callbacks[0]();
+
+        expect(onComplete).not.toHaveBeenCalled();
+        expect(onComplete).not.toHaveBeenCalledWith('hello world');
+        done();
+    });
+
     it('should not start the jobs until the server starts', async () => {
 
         const server = new Hapi.Server();
