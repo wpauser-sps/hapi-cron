@@ -70,8 +70,7 @@ const internals = {
 };
 
 const PluginRegistration = (server: Hapi.Server, options: PluginConfig): void => {
-  const jobs = {};
-  const config = [];
+  const jobs: { [key: string]: CronJob } = {};
 
   if (!options.jobs || !options.jobs.length) {
     server.log([PluginPackageJson.name], 'No cron jobs provided.');
@@ -97,7 +96,6 @@ const PluginRegistration = (server: Hapi.Server, options: PluginConfig): void =>
       Hoek.assert(typeof job.invoke === 'function' || typeof job.onComplete === 'undefined', 'invoke value must be a function or boolean');
 
       try {
-        config.push(job);
         jobs[job.name] = new CronJob(job.time, internals.trigger(server, job), null, false, job.timezone);
       } catch (err) {
         if (err.message === 'Invalid timezone.') {
@@ -113,7 +111,7 @@ const PluginRegistration = (server: Hapi.Server, options: PluginConfig): void =>
     server.events.on('start', () => {
       const t = new Table();
 
-      const table = config.map((job) => {
+      const table = options.jobs.map((job) => {
         return {
           name: job.name,
           nextRun: Parse.parseExpression(job.time).next(),
@@ -135,7 +133,7 @@ const PluginRegistration = (server: Hapi.Server, options: PluginConfig): void =>
       });
 
       console.log();
-      console.log(Chalk.cyan.underline(`${config.length} cronjobs registered`));
+      console.log(Chalk.cyan.underline(`${options.jobs.length} cronjobs registered`));
       console.log(t.toString());
     });
   }
