@@ -1,11 +1,26 @@
 {
-  "name": "hapi-cron",
-  "version": "1.0.6",
-  "description": "A Hapi plugin to setup cron jobs that will call predefined server routes at specified times",
-  "main": "lib/index.js",
+  "name": "@speechportal/cron",
+  "version": "0.0.1",
+  "description": "Fork of hapi-cron: A Hapi plugin to setup cron jobs that will call predefined server routes at specified times",
+  "main": "./dist/index",
+  "types": "./dist/index",
   "scripts": {
-    "test": "npm run eslint && jest --runInBand",
-    "eslint": "eslint ."
+    "build": "tsc -p tsconfig.build.json && prettier --write \"dist/**/*{.d.ts,.js}\"",
+    "clear": "npx rimraf ./dist && npx rimraf ./tsconfig.tsbuildinfo",
+    "clear:all": "npx rimraf ./dist && npx rimraf ./.nyc_output && npx rimraf ./coverage && npx rimraf ./node_modules && npx rimraf ./tsconfig.tsbuildinfo",
+    "clear:build": "npx rimraf ./dist",
+    "clear:modules": "npx rimraf ./node_modules",
+    "clear:tests": "npx rimraf ./.nyc_output && npx rimraf ./coverage",
+    "lint": "eslint src/**",
+    "lint:fix": "eslint src/** --fix",
+    "prepack": "npm run build",
+    "prettier:format": "prettier 'src/**/*.ts' --write",
+    "prettier:watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
+    "test": "jest -c jest.unit.config.ts --runInBand --no-cache --forceExit --colors --passWithNoTests",
+    "test:integration": "jest -c jest.integration.config.ts --runInBand --no-cache --forceExit --colors --passWithNoTests",
+    "test:unit:coverage": "jest --runInBand --no-cache --forceExit --passWithNoTests --colors --silent --coverage -c jest.unit.config.js",
+    "test:integration:coverage": "jest --runInBand --no-cache --forceExit --colors --coverage -c jest.integration.config.js",
+    "watch": "npx tsc -w"
   },
   "repository": {
     "type": "git",
@@ -22,33 +37,18 @@
     "url": "https://github.com/antonsamper/hapi-cron/issues"
   },
   "homepage": "https://github.com/antonsamper/hapi-cron#readme",
-  "devDependencies": {
-    "@hapi/eslint-config-hapi": "^12.1.0",
-    "@hapi/eslint-plugin-hapi": "^4.3.3",
-    "@hapi/hapi": "^18.3.1",
-    "eslint": "^6.0.0",
-    "jest": "^24.8.0"
-  },
   "dependencies": {
     "@hapi/hoek": "^7.2.0",
-    "chalk": "^5.1.2",
+    "chalk": "^4.1.2",
     "cron": "^1.7.1",
     "cron-parser": "^4.6.0",
     "easy-table": "^1.2.0"
   },
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "jest": {
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "branches": 100,
-        "functions": 100,
-        "lines": 100,
-        "statements": 100
-      }
-    },
-    "testEnvironment": "node"
+  "devDependencies": {
+    "@types/chalk": "^2.2.0",
+    "@types/hapi__hapi": "^20.0.1",
+    "@hapi/hapi": "^20.2.1",
+    "@types/node": "^16.11.1",
+    "jest": "^26.4.2"
   }
 }
